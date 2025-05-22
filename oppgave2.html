@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oppgave 2 - Miaow Miaow møter fisken</title>
+    <link rel="stylesheet" href="css/oppgave2.css" type="text/css">
+</head>
+<body>
+    
+    <div id="menu-container">
+        <input id="move-left-btn" type="button" value="Venstre">
+        <input id="move-up-btn" type="button" value="Opp">
+        <input id="move-right-btn" type="button" value="Høyre">
+        <input id="move-down-btn" type="button" value="Ned">
+    </div>
+    <div id="game-container">
+        <p>Antall steg: <span id="number-of-steps-span">0</span></p>
+        <img id="miaow-miaow" src="images/miaow-miaow.png">
+        <img id="the-mighty-fish" src="images/fish.png">
+        <h2 id="fish-room-title">Fiskens rom</h2>
+        <div id="line-div"></div>
+    </div>
+    <div id="dialogue-output-div">
+        <p>Miaow Miaow: <span id="miaow-miaow-says">...</span></p>
+        <p>Fisken: <span id="fish-says">...</span></p>
+    </div>
+
+    <script>
+
+        /*
+            ***
+            GET HTML-ELEMENTS
+            ***
+        */
+
+            /*BUTTONS*/
+
+        /*Buttons that moves the cat in different directions*/
+        var moveLeftBtn = document.getElementById("move-left-btn");
+        var moveUpBtn = document.getElementById("move-up-btn");
+        var moveRightBtn = document.getElementById("move-right-btn");
+        var moveDownBtn = document.getElementById("move-down-btn");
+
+            /*GAME CONTAINER*/
+        var gameContainer = document.getElementById("game-container");
+
+            /*OUTPUT NUMBER OF STEPS*/
+        var numberOfStepsOutput = document.getElementById("number-of-steps-span");
+
+            /*CAT*/
+        var cat = document.getElementById("miaow-miaow");
+
+            /*FISH*/
+        var fish = document.getElementById("the-mighty-fish");
+
+            /*DIALOG BETWEEN CAT AND FISH*/
+        var catQuestion = document.getElementById("miaow-miaow-says");
+        var fishAnswer = document.getElementById("fish-says");
+
+        /*Information to the user about the game before the game starts*/
+        alert("Hensikten med spillet er å få til en samtale mellom fisken og katten. Lykke til!\n\nHint: Klikk på et av dyrene")
+
+
+        /*
+            ***
+            ARRAYS
+            ***
+        */
+
+        var catQuestionArray = [
+            "Hva heter du?",
+            "Hva er din favorittfarge?",
+            "Hva liker du best å gjøre?",
+            "Hva er din favorittsang?",
+            "Liker du sommer eller vinter best?"
+        ]
+
+        var fishAnswerArray = [
+            "Sondre",
+            "Blå",
+            "Svømme",
+            "Baby Shark",
+            "Sommer"
+        ]
+
+
+
+        /*
+            ***
+            FUNCTIONS
+            ***
+        */
+
+        /*
+        Function that moves the cat around.
+        The function has a parameter.
+        When the user push the button, it sends an argument to function.
+        The if's check the parameter to find out which way to move the cat.
+        The cat is not allowed to move outside the gameboard, so the if's check if the position is larger than zero.
+        The steps are counted by the variable numberOfSteps and printes to the web page.
+        The fish don't want the cat to come too close, so if the cat is to close the fish sends the cat back to start with a message.
+        */
+        var positionTopCat = 0;
+        var positionLeftCat = 0;
+        var numberOfSteps = 0;
+
+        function moveCat( direction ) {
+            
+            fishAnswer.innerHTML = "";
+
+            if( direction === "left" && positionLeftCat > 0 ) {
+
+                positionLeftCat -= 50;
+
+                cat.style.left = `${positionLeftCat}px`;
+
+                numberOfSteps++;
+
+            }else if( direction === "up" && positionTopCat > 0 ){
+                
+                positionTopCat -= 50;
+
+                cat.style.top = `${positionTopCat}px`;
+
+                numberOfSteps++;
+
+            }else if( direction === "right" ) {
+                
+                positionLeftCat += 50;
+
+                cat.style.left = `${positionLeftCat}px`;
+
+                numberOfSteps++;
+
+            }else if( direction === "down" && positionTopCat < 500 ){
+
+                positionTopCat += 50;
+                
+                cat.style.top = `${positionTopCat}px`;
+
+                numberOfSteps++;
+
+            }
+
+            if( positionLeftCat > 700 ){
+
+                cat.style.left = "0px";
+                fishAnswer.innerHTML = `Dette ble vel intimt for min smak, så jeg ble nødt til å sende deg tilbake til start!`;
+                catQuestion.innerHTML = "";
+                positionLeftCat = 0;
+                numberOfSteps = 0;
+            }
+
+            numberOfStepsOutput.innerHTML = `${numberOfSteps}`;
+
+        }
+
+        /*
+        Function that makes the cat and fish have a dialog.
+        The questions and answers that appear on the screen are random. This function calls the function randomNumber that returns a random number.
+        To have a dialog the cat must enter the fish room (600px). If the cat is too far away it gets a message.
+        If the cat is in the fish room the function gets a random question from catQuestionArray and a random answer from the fishAnswerArray
+        */
+            function catFishDialog() {
+                var i = randomNumber();
+                var j = randomNumber();
+
+                if( positionLeftCat < 600 ) {
+                    
+                    fishAnswer.innerHTML = `Du er for langt unna, jeg hører ikke hva du sier!`
+                
+                }else{
+
+                catQuestion.innerHTML = `${catQuestionArray[i]}`;
+                fishAnswer.innerHTML = `${fishAnswerArray[j]}`;
+                
+                }
+            }
+
+        //Function that returns a random number to make the questions and answers random
+        function randomNumber() {
+
+            var indexNumber = Math.floor( Math.random() * 5 );
+
+            return indexNumber;
+        }
+
+        /*
+            ***
+            ONCLICK EVENTS
+            ***
+        */
+
+        /*
+        Buttons that moves the cat around.
+        The buttons sends an argument to the function about which way the cat should move.
+        */
+        moveLeftBtn.onclick = function() {
+            moveCat("left");
+        }
+
+        moveUpBtn.onclick = function() {
+            moveCat("up");
+        }
+
+        moveRightBtn.onclick = function() {
+            moveCat("right");
+        }
+
+        moveDownBtn.onclick = function() {
+            moveCat("down");
+        }
+
+        /*
+        Button to make the cat and fish have a dialog.
+        When the user click on the fish it calls the function to make the cat and fish have a dialog.
+        */
+        fish.onclick = catFishDialog;
+
+    </script>
+    
+</body>
+</html>

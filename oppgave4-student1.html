@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oppgave 4 - student 1</title>
+</head>
+<body>
+    
+    <h1>Velkommen til SparebankTull</h1>
+
+    <p>Her kan du opprette ulike kontoer med svært ugunstige renter</p> <br> <br>
+
+    <!--OPPRETTE KONTO-->
+
+    <h2>Opprett eller logge inn på konto</h2>
+    <p>Det er kun lov å opprette en konto av hver type</p>
+
+    <!--Tekstbokser som brukeren fyller inn informasjon-->
+    <label>Fornavn</label>
+    <input id="fornavn-txt" type="text"> <br> <br>
+
+    <label>Etternavn</label>
+    <input id="etternavn-txt" type="text"> <br> <br>
+
+    <label>Fødselsnummer</label>
+    <input id="fodselsnummer-txt"> <br> <br>
+    
+    <!--Knapper for å opprette de ulike kontoene-->
+    <button id="brukskonto-btn">Brukskonto</button>
+    <button id="sparekonto-btn">Sparekonto</button>
+    <button id="lønnskonto-btn">Lønningskonto</button>
+
+    <!--Viser kontoen som er opprettet på siden-->
+    <div id="output-div-1"></div>
+
+    <br><br><br>
+
+    <!--OVERFØRING AV PENGER-->
+    <h2>Overføring av penger mellom kontoene</h2>
+    <h3>Husk å logge inn på kontoene først i det øverste feltet</h3>
+
+    <!--Tekstboks hvor brukeren fyller inn hvor mye penger som skal overføres-->
+    <!--Fra konto-->
+    <label>Fra konto</label>
+    <select id="fra-konto-valg">
+        <option>Velg konto</option>
+        <option value="1">Brukskonto</option>
+        <option value="2">Sparekonto</option>
+        <option value="3">Lønningskonto</option>
+    </select>
+
+    <!--Til konto-->
+    <label>Til konto</label>
+    <select id="til-konto-valg">
+        <option>Velg konto</option>
+        <option value="4">Brukskonto</option>
+        <option value="5">Sparekonto</option>
+        <option value="6">Lønningskonto</option>
+    </select>
+
+    <!--Hvilken sum brukeren ønsker å overføre-->
+    <label>Sum</label>
+    <input id="sum-overforing-input" type="text">
+
+    <!--Knapp for å gjennomføre overføringen av penger mellom konto-->
+    <button id="overfor-btn">Overfør</button>
+
+    <!--Status på kontoene før og etter overføring-->
+    <h3>På konto før overføring</h3>
+    <div id="output-div-2"></div>
+
+    <h3>På konto etter overføring</h3>
+    <div id="output-div-3"></div>
+
+    <br><br><br>
+
+
+
+    <!--BETALE REGNINGER-->
+    <h2>Betale regninger</h2>
+    <h3>Husk å logge inn på kontoen først i det øverste feltet</h3>
+
+    <!--Nedtrekkmeny for å velge hvilken konto brukeren ønsker å betale regning-->
+    <label>Fra konto</label>
+    <select id="fra-konto-valg-betale">
+        <option>Velg konto</option>
+        <option value="1">Brukskonto</option>
+        <option value="2">Sparekonto</option>
+        <option value="3">Lønningskonto</option>
+    </select>
+
+    <br><br>
+
+    <!--Brukeren skriver inn kontonummer det skal betales til og beløp. Knapp for å gjennomføre betalingen-->
+    <label>Til kontonummer</label>
+    <input type="text"> <br><br>
+
+    <label>Beløp</label>
+    <input id="belop-input" type="text"> <br><br>
+    <button id="betal-btn">Betal</button>
+
+    
+    <div id="output-div-4"></div>
+
+    <script>
+        /*
+            ***
+            Hente HTML-elementer
+            ***
+        */
+
+            /*Knapper*/
+        var brukskontoBtn = document.getElementById("brukskonto-btn");
+        var sparekontoBtn = document.getElementById("sparekonto-btn");
+        var lonnskontoBtn = document.getElementById("lønnskonto-btn");
+        var overforBtn = document.getElementById("overfor-btn");
+        var betalBtn = document.getElementById("betal-btn");
+
+            /*Output*/
+        var outputDiv1 = document.getElementById("output-div-1");
+        var outputDiv2 = document.getElementById("output-div-2");
+        var outputDiv3 = document.getElementById("output-div-3");
+        var outputDiv4 = document.getElementById("output-div-4");
+
+            /*Tekstbokser hvor brukeren fyller inn informasjon*/
+        var fornavnTxt = document.getElementById("fornavn-txt");
+        var etternavnTxt = document.getElementById("etternavn-txt");
+        var fodselsnummerTxt = document.getElementById("fodselsnummer-txt");
+
+            /*Nedtrekksmeny*/
+        var fraKontoValg = document.getElementById("fra-konto-valg");
+        var tilKontoValg = document.getElementById("til-konto-valg");
+        var fraKontoValgBetale = document.getElementById("fra-konto-valg-betale");
+
+            /*Inputboks*/
+        var sumOverforingInput = document.getElementById("sum-overforing-input");
+        var belopInput = document.getElementById("belop-input");
+        
+        /*
+            ***
+            FUNKSJONER
+            ***
+        */
+
+        /*
+        Oppretter konto.
+        Funksjonen har en parameter for av avgjøre hvilken if som skal kjøre, det vil si hvilkne konto brukeren ønsker å opprette.
+        Verdiene brukeren har tastet inn hentes.
+        Dersom noen av feltene er tomme, får brukeren beskjed om at alle feltene må fylles inn. Ellers skrives kontoen ut på siden.
+        Brukeren får bare opprette en av hver type konto, etter dette fungerer ikke knappen lenger.
+        Funksjonen fjernInputTekst kalles for å tømme feltene brukeren har tastet inn verdi, slik at feltene er klare for ny input-informasjon.
+        
+        */
+
+        function oppretteKonto( typeKonto ) {
+
+            var htmlTxt = "";
+            var fornavn = fornavnTxt.value;
+            var etternavn = etternavnTxt.value;
+            var fodselsnummer = fodselsnummerTxt.value;
+
+            if( typeKonto === "brukskonto" ){
+
+                if( fornavnTxt.value === "" || etternavnTxt.value === "" || fodselsnummerTxt.value === "" ){
+
+                    alert("Du må fylle inn alle feltene");
+
+                }else{
+
+                    htmlTxt = `
+                        <div id="brukskonto-div">
+                            <h4>Brukskonto</h4>
+                            <p>Fornavn: ${fornavn}</p>
+                            <p>Etternavn: ${etternavn}</p>
+                            <p>Fødselsnummer: ${fodselsnummer}</p>
+                        </div>
+                    `;
+
+                    brukskontoBtn.disabled = true;
+                    fjernInputTekst();
+                }
+
+            }else if( typeKonto === "sparekonto" ){
+                
+                if( fornavnTxt.value === "" || etternavnTxt.value === "" || fodselsnummerTxt.value === "" ){
+                    
+                    alert( "Du må fylle inn alle feltene" );
+
+                }else{
+
+                    htmlTxt = `
+                    <div id="sparekonto-div">
+                        <h4>Sparekonto</h4>
+                        <p>Fornavn: ${fornavn}</p>
+                        <p>Etternavn: ${etternavn}</p>
+                        <p>Fødselsnummer: ${fodselsnummer}</p>
+                    </div>
+                `;
+
+                sparekontoBtn.disabled = true;
+
+                fjernInputTekst();
+
+                }
+
+            }else if( typeKonto === "lonnskonto" ){
+
+                if( fornavnTxt.value === "" || etternavnTxt.value === "" || fodselsnummerTxt.value === "" ){
+
+                    alert( "Du må fylle inn alle feltene" );
+
+                }else{
+
+                htmlTxt = `
+                    <div id="lonnskonto-div">
+                        <h4>Lønningskonto</h4>
+                        <p>Fornavn: ${fornavn}</p>
+                        <p>Etternavn: ${etternavn}</p>
+                        <p>Fødselsnummer: ${fodselsnummer}</p>
+                    </div>
+                `;
+
+                lonnskontoBtn.disabled = true;
+
+                fjernInputTekst();
+
+                }
+            }
+
+            outputDiv1.innerHTML += htmlTxt;
+
+        }
+
+        //Funksjon som fjerner tekst i tekstboksene
+        function fjernInputTekst() {
+
+            fornavnTxt.value = "";
+            etternavnTxt.value = "";
+            fodselsnummerTxt.value = "";
+
+        }
+
+        /*
+        Beløp på kontoene som brukes av funksjonene overforePenger og betaleRegning
+        */
+        var paaBrukskonto = 5000;
+        var paaSparekonto = 10000;
+        var paaLonnskonto = 2000;
+
+        /*
+        Overfører penger.
+        Henter nedtrekksmenyene og kontoene (divene) brukeren har opprettet på siden
+        */
+        function overforePenger() {
+            
+            var htmlTxt = "";
+            var htmlTxt2 = "";
+            
+            var fraKonto = fraKontoValg.value;
+            var tilKonto = tilKontoValg.value;
+            
+            var fraBrukskonto = document.getElementById("brukskonto-div");
+            var tilBrukskonto = document.getElementById("brukskonto-div");
+            
+            var fraSparekonto = document.getElementById("sparekonto-div");
+            var tilSparekonto = document.getElementById("sparekonto-div");
+
+            var fraLonnskonto = document.getElementById("lonnskonto-div");
+            var tilLonnskonto = document.getElementById("lonnskonto-div");
+
+            var sumOverforing = parseInt(sumOverforingInput.value);
+            
+            /*
+            Bruker velger hvilke konto hen ønsker å overføre fra fra en nedtrekksmeny (hvilken case som kjøres). 
+            Dersom det er nok penger på kontoen gjennomføres overføringen.
+            Brukeren får informasjon om hvor mye som er på fra-konto før overføring.
+            Beløpet brukeren ønsker å overføre trekkes fra summen på konto.
+            Det skrives ut til siden hva den nye saldoen er og variabelen med saldo oppdateres til ny saldo.
+            Dersom det ikke er nok penger på konto, vil brukeren få en feilmelding om at det ikke er nok penger på konto og hva saldoen er.
+            Funksjonen med samme oppdateringer på til-kontoen kalles.
+            */
+            switch( fraKonto ) {
+                
+                case "1":
+                    if( paaBrukskonto >= sumOverforing ){
+
+                        htmlTxt += `<p>På brukskonto før overføring: ${paaBrukskonto} kr</p>`;
+
+                        var sumEtterOverforingFraBrukskonto = paaBrukskonto - sumOverforing;
+
+                        htmlTxt2 += `<p>På brukskonto etter overføring: ${sumEtterOverforingFraBrukskonto} kr</p>`;
+
+                        paaBrukskonto = sumEtterOverforingFraBrukskonto;
+
+                        overforPengerOmNokPåFraKonto();
+
+                    }else{
+
+                        htmlTxt += `<p>Du har ikke nok penger på konto. Din saldo er ${paaBrukskonto}</p>`;
+                    }
+                    
+                break;
+                case "2":
+                    if( paaSparekonto <= sumOverforing ) {
+
+                        htmlTxt += `<p>På sparekonto før overføring: ${paaSparekonto} kr</p>`;
+
+                        var sumEtterOverforingFraSparekonto = paaSparekonto - sumOverforing;
+
+                        htmlTxt2 += `<p>På brukskonto etter overføring: ${sumEtterOverforingFraSparekonto} kr</p>`;
+
+                        paaSparekonto = sumEtterOverforingFraSparekonto;
+
+                        overforPengerOmNokPåFraKonto();
+
+                    }else{
+
+                        htmlTxt += `<p>Du har ikke nok penger på konto. Din saldo er ${paaSparekonto}</p>`; 
+
+                    }
+                break;
+                case "3":
+                    if( paaLonnskonto <= sumOverforing ) {
+
+                        htmlTxt += `<p>På lønningskonto før overføring: ${paaLonnskonto} kr</p>`;
+
+                        var sumEtterOverforingFraLonnskonto = paaLonnskonto - sumOverforing;
+
+                        htmlTxt2 += `<p>På lønningskonto etter overføring: ${sumEtterOverforingFraLonnskonto} kr</p>`;
+
+                        paaLonnskonto = sumEtterOverforingFraLonnskonto;
+
+                        overforPengerOmNokPåFraKonto();
+
+
+                }else{
+
+                    htmlTxt += `<p>Du har ikke nok penger på konto. Din saldo er ${paaLonnskonto}</p>`; 
+
+                }
+                break;
+            }
+    
+
+            function overforPengerOmNokPåFraKonto() {
+                switch( tilKonto ) {
+                    case "4":
+                        htmlTxt += `<p>På brukskonto før overføring: ${paaBrukskonto} kr</p>`;
+
+                        var sumEtterOverforingTilBrukskonto = paaBrukskonto + sumOverforing;
+
+                        htmlTxt2 += `<p>På brukskonto etter overføring: ${sumEtterOverforingTilBrukskonto} kr</p>`;
+
+                        paaBrukskonto = sumEtterOverforingTilBrukskonto;
+
+                    break;
+                    case "5": 
+                        htmlTxt += `<p>På sparekonto før overføring ${paaSparekonto} kr</p>`;
+
+                        var sumEtterOverforingTilSparekonto = paaSparekonto + sumOverforing;
+
+                        htmlTxt2 += `<p>På sparekonto etter overføring: ${sumEtterOverforingTilSparekonto} kr</p>`;
+
+                        paaSparekonto = sumEtterOverforingTilSparekonto;
+
+                    break;
+                    case "6":
+                        htmlTxt += `<p>På lønningskonto før overføring: ${paaLonnskonto} kr</p>`;
+
+                        var sumEtterOverforingTilLonnskonto = paaLonnskonto + sumOverforing;
+
+                        htmlTxt2 += `<p>På lønningskonto etter overføring: ${sumEtterOverforingTilLonnskonto} kr</p>`;
+
+                        paaLonnskonto = sumEtterOverforingTilLonnskonto;
+
+                    break;    
+                }
+            }
+
+            outputDiv2.innerHTML = htmlTxt;
+            outputDiv3.innerHTML = htmlTxt2;
+
+        }
+
+        /*Betaler regninger*/
+
+        function betaleRegning() {
+            var htmlTxt = "";
+
+            var belop = parseInt(belopInput.value);
+
+            var fraKonto = fraKontoValgBetale.value;
+
+            var fraBrukskonto = document.getElementById("brukskonto-div");
+            var fraSparekonto = document.getElementById("sparekonto-div");
+            var fraLonnskonto = document.getElementById("lonnskonto-div");
+
+            var riktigPassord = "Passord";
+            var passordKorrekt = false
+
+            /*
+            En while-løkke kjører så lenge brukeren taster inn feil passord. 
+            Før brukeren får gjennomføre betalingen kalles funksjonen tastInnPassord og brukeren blir spurt om å taste inn passord.
+            Om passordet brukeren taster inn er likt det riktige passordet, kjøres teknikken switch for å fange opp hvilken 
+            konto brukeren ønsker å betale fra.
+            Hvis brukeren taster feil passord får hen beskjed om det og får mulighet til å taste inn passord på nytt.
+            */
+            
+        while( passordKorrekt === false ){
+
+            if( tastInnPassord() === riktigPassord ){
+
+                passordKorrekt = true;                
+            
+                switch( fraKonto ) {
+                case "1":
+                    if( paaBrukskonto >= belop ) {
+
+                        htmlTxt += `<p>På brukskonto før betaling: ${paaBrukskonto} kr</p>`;
+
+                        var sumEtterBetalingBrukskonto = paaBrukskonto - belop;
+
+                        htmlTxt += `<p>På brukskonto etter betaling: ${sumEtterBetalingBrukskonto}</p>`;
+
+                        paaBrukskonto = sumEtterBetalingBrukskonto;
+
+                    }else{
+
+                        htmlTxt += `<p>Du har ikke nok penger på konto. Din saldo er ${paaBrukskonto}</p>`; 
+
+                    }
+                break;
+                case "2":
+                    if( paaSparekonto >= belop ) {
+
+                        htmlTxt += `<p>På sparekonto før betaling: ${paaSparekonto} kr</p>`;
+
+                        var sumEtterBetalingSparekonto = paaSparekonto - belop;
+
+                        htmlTxt += `<p>På sparekonto etter betaling: ${sumEtterBetalingSparekonto}</p>`;
+
+                        paaSparekonto = sumEtterBetalingSparekonto;
+
+                    }else{
+
+                        htmlTxt += `<p>Du har ikke nok penger på konto. Din saldo er ${paaSparekonto}</p>`; 
+
+                    }
+                break;
+                case "3":
+                    if( paaLonnskonto >= belop ) {
+
+                        htmlTxt += `<p>På lønningskonto før betaling: ${paaLonnskonto} kr</p>`;
+
+                        var sumEtterBetalingLonnskonto = paaLonnskonto - belop;
+
+                        htmlTxt += `<p>På lønningskonto etter betaling: ${sumEtterBetalingLonnskonto}</p>`;
+
+                        paaLonnskonto = sumEtterBetalingLonnskonto;
+
+                    }else{
+
+                        htmlTxt += `<p>Du har ikke nok penger på konto. Din saldo er ${paaLonnskonto}</p>`; 
+
+                    }
+                break;
+                }
+
+            }else{
+
+                alert("Du tastet feil passord")
+
+            }
+        }
+
+        outputDiv4.innerHTML = htmlTxt;
+        
+        }        
+    
+        /*Funksjon som spør etter passord*/
+        function tastInnPassord() {
+
+            var brukerPassord = prompt("Tast inn passord:");
+
+            return brukerPassord;
+            
+        }
+            
+        /*
+            ***
+            KOBLER KNAPPENE TIL EN FUNKSJON
+            ***
+        */
+        brukskontoBtn.onclick = function() {
+            oppretteKonto("brukskonto");
+        }
+
+        sparekontoBtn.onclick = function() {
+            oppretteKonto("sparekonto")
+        }
+
+        lonnskontoBtn.onclick = function() {
+            oppretteKonto("lonnskonto")
+        }
+
+        overforBtn.onclick = overforePenger;
+
+        betalBtn.onclick = betaleRegning;
+
+        
+
+
+    </script>
+
+</body>
+</html>
